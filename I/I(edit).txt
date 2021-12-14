@@ -1,0 +1,54 @@
+  auto green_1 = 10;
+  auto yellow_1 = 11;
+  auto red_1 = 12;
+  auto red_2 = 5;
+  auto green_2 =4;
+  int swq = 0;
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinMode(green_1,OUTPUT);
+  pinMode(yellow_1,OUTPUT);
+  pinMode(red_1,OUTPUT);
+  pinMode(red_2,OUTPUT);
+  pinMode(green_2,OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  swq = digitalRead(2);
+  Serial.print(swq);
+  digitalWrite(green_1,HIGH);
+  digitalWrite(red_2,HIGH);
+  if(swq != 0){
+      digitalWrite(green_1,LOW);
+      digitalWrite(yellow_1,HIGH);
+      delay(2000);
+      digitalWrite(yellow_1,LOW);
+      digitalWrite(red_1,HIGH);
+      delay(1000);
+      digitalWrite(red_2,LOW);
+      digitalWrite(green_2,HIGH);
+      delay(5000);
+      mirg();
+      digitalWrite(red_2,HIGH);
+      delay(500);
+      digitalWrite(yellow_1,HIGH);
+      digitalWrite(red_1,LOW);
+      delay(500);
+      digitalWrite(yellow_1,LOW);
+      swq = 0;
+    }
+ 
+}
+void mirg(){
+  for(int i = 0;i<10;i++){
+     digitalWrite(green_2,HIGH);
+    delay(250);
+    digitalWrite(green_2,LOW);
+    delay(250); 
+  }
+  //Serial.print();
+  //Serial.println();
+}
+

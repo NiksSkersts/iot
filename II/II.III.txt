@@ -1,0 +1,22 @@
+#define GREEN 4
+#define RED 2
+#define BLUE 3
+#define ANALOGPIN A0
+int value;
+int r;
+int g;
+int b;
+void setup() {
+  Serial.begin(115200); // Open serial monitor at 115200 baud to see ping results.
+  pinMode(GREEN, OUTPUT);
+  pinMode(BLUE, OUTPUT);
+  pinMode(RED, OUTPUT);
+  pinMode(ANALOGPIN,INPUT);
+}
+
+void loop() {
+  value = analogRead(ANALOGPIN);
+  r = map(value,0,1023,255,0);
+  digitalWrite(RED,r);
+  Serial.println(r);
+}
