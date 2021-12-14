@@ -1,0 +1,2 @@
+# iot
+Viedās tehnoloģijas
