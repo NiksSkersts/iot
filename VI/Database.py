@@ -12,6 +12,7 @@ def insert(code):
     cur = conn.cursor()
     try:
         current = datetime.now(pytz.timezone("Europe/Riga"))
+        # time.mktime converts human-readable datetime to EPOCH.
         ti = time.mktime(current.timetuple())
         cur.execute(insert_query, (code, ti))
         conn.commit()

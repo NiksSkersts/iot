@@ -24,6 +24,7 @@ def popup():
     if result is not None:
         tk.Label(popupRoot, text="Datums un laiks", font=('Mistral 18 bold')).pack()
         for i in result:
+            # datetime.fromtimestamp converts EPOCH date integer to human-readable datetime.
             dt = datetime.fromtimestamp(i[1]).strftime('%Y-%m-%d %H:%M:%S')
             tk.Label(popupRoot, text="{0}, {1}".format(i[0], dt), font=('Mistral 18 bold')).pack()
     else:
@@ -41,6 +42,7 @@ def ok_popup(code):
     return popupRoot
 
 
+# Deals with closing of the program. Releases the used resources.
 def onClose():
     print("[INFO] closing...")
     stopEvent.set()
@@ -89,6 +91,9 @@ def read_barcodes(frame):
     if points is not None:
         points = points[0]
         # Draw a line around the QR code.
+        # This for cycle draws a rectangle around the QR code.
+        # It should probably be removed, or I should try to reduce the amount of false detections.
+        # A lot of false detections lead to strange line drawing and empty data.
         for i in range(len(points)):
             pt1 = [int(val) for val in points[i]]
             pt2 = [int(val) for val in points[(i + 1) % 4]]
@@ -96,16 +101,32 @@ def read_barcodes(frame):
         # False positives are barcodes that have an empty string for data.
         # This if filters those out before inserting into database and blocking the thread with ok_popup.
         if data != '' or "":
-            Database.insert(data)
-            ok = ok_popup(data)
-            ok.mainloop()
+            # It is possible that the library doesn't support reading multiple QRs.
+            # As a workaround I have implemented a set() of QR codes, that gets updated each time I find a new QR code.
+            # I have also implemented an if function that checks if the code that was presented is already in the set().
+            if not Previous.__contains__(data):
+                Database.insert(data)
+                ok = ok_popup(data)
+                Previous.add(data)
+                ok.mainloop()
+    # Return the frame, as it will be used to create an image, that will later be displayed in panel.
     return frame
 
 
+# On setting the stop event, it should be enough to terminate the video_loop thread.
+# Event is working, but the thread fails to join with the main thread.
+# It would most likely take a class to fix that.
+# Something along the lines of:
+# https://github.com/NiksSkersts/iot/commit/6f9c031b8b903bcb93873b462c363727e2f0baab#diff-dc7b94e12cffc1d23c55f1f9bf77857827d2148f12a8f010df361e3b2db05533
 stopEvent = threading.Event()
+# Panel that is responsible for displaying the frames.
 panel = None
+# Implementation that detects the QR codes from the matrix provided by the camera.
 decoder = cv2.QRCodeDetector()
+Previous = set()
 
+# Main part of the code, that deals with construction of the GUI and initial setup.
+# The code fully works on laptop, and I expect it to fully work on Raspberry Pi.
 if __name__ == '__main__':
     # Creates the GUI
     root = tk.Tk()
@@ -125,9 +146,10 @@ if __name__ == '__main__':
     thread = threading.Thread(target=video_loop, args=())
     thread.start()
 
-    # Set a callback to handle when the window is closed
+    # Set a callback to handle when the window is closed.
+    # Breaks the root.mainLoop().
     root.wm_title("qr")
     root.wm_protocol("WM_DELETE_WINDOW", onClose)
 
-    # Blocks the thread
+    # Blocks the thread with an infinite loop.
     root.mainloop()
