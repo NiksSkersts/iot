@@ -1,12 +1,13 @@
 # Import region!
+import cv2
 import sys
-from datetime import datetime
 import threading
 import time
-import cv2
-import Database
-from PIL import Image, ImageTk
 import tkinter as tk
+from PIL import Image, ImageTk
+from datetime import datetime
+
+import Database
 
 
 # Function region

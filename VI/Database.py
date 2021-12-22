@@ -1,9 +1,9 @@
+import pytz as pytz
 import sqlite3
 import time
 from datetime import datetime, timedelta, tzinfo, timezone
 from sqlite3 import Error
 
-import pytz as pytz
 
 # Inserts into database. Converts Human readable date to EPOCH.
 def insert(code):
@@ -19,12 +19,14 @@ def insert(code):
         return -1
     return cur.lastrowid
 
+
 # Counts the entries in database
 def count():
     conn = sqlite3.connect("data.db")
     data_copy = conn.execute("SELECT max(rowid) from barcode")
     values = data_copy.fetchone()[0]
     return values
+
 
 # selects the rows from database, that gets parsed and used in listing the data.
 def inquiry():
